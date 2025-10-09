@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Prisma } from "@prisma/client"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 
@@ -48,7 +48,7 @@ export async function GET(req) {
       where.sellerId = userId
     }
 
-    const orderBy =
+    const baseOrderBy =
       ordem === "antigos"
         ? { publishedAt: "asc" }
         : ordem === "maior_preco"
@@ -62,26 +62,89 @@ export async function GET(req) {
     
     const skip = (page - 1) * limit
 
-    const produtos = await prisma.product.findMany({
-      where,
-      include: {
-        seller: { select: { email: true } },
-        favorites: userId ? { where: { userId } } : false,
-      },
-      orderBy,
-      skip,
-      take: limit,
-    })
+    let produtos = []
 
-    const produtosComFlag = produtos.map((p) => ({
-      ...p,
-      sellerEmail: p.seller?.email ?? null,
-      isFavorite: Array.isArray(p.favorites) && p.favorites.length > 0,
-    }))
+    if (userId) {
+      const favoriteIds = await prisma.favorite.findMany({
+        where: { userId },
+        select: { productId: true }
+      })
+      const favoriteProductIds = favoriteIds.map(f => f.productId)
 
-    const favoritos = produtosComFlag.filter((p) => p.isFavorite)
-    const naoFavoritos = produtosComFlag.filter((p) => !p.isFavorite)
-    const produtosPagina = [...favoritos, ...naoFavoritos]
+      const favoriteWhere = {
+        ...where,
+        id: { in: favoriteProductIds }
+      }
+
+      const nonFavoriteWhere = {
+        ...where,
+        id: { notIn: favoriteProductIds }
+      }
+
+      let favoriteProducts = []
+      let nonFavoriteProducts = []
+      let remainingLimit = limit
+      let remainingSkip = skip
+
+      if (remainingSkip < favoriteProductIds.length) {
+        const favSkip = remainingSkip
+        const favTake = Math.min(remainingLimit, favoriteProductIds.length - remainingSkip)
+        
+        if (favTake > 0) {
+          favoriteProducts = await prisma.product.findMany({
+            where: favoriteWhere,
+            include: {
+              seller: { select: { email: true } },
+            },
+            orderBy: baseOrderBy,
+            skip: favSkip,
+            take: favTake,
+          })
+          remainingLimit -= favoriteProducts.length
+          remainingSkip = 0
+        }
+      } else {
+        remainingSkip -= favoriteProductIds.length
+      }
+
+      if (remainingLimit > 0) {
+        nonFavoriteProducts = await prisma.product.findMany({
+          where: nonFavoriteWhere,
+          include: {
+            seller: { select: { email: true } },
+          },
+          orderBy: baseOrderBy,
+          skip: remainingSkip,
+          take: remainingLimit,
+        })
+      }
+
+      const allProducts = [...favoriteProducts, ...nonFavoriteProducts]
+      
+      produtos = allProducts.map((p) => ({
+        ...p,
+        sellerEmail: p.seller?.email ?? null,
+        isFavorite: favoriteProductIds.includes(p.id),
+      }))
+    } else {
+      const produtosRaw = await prisma.product.findMany({
+        where,
+        include: {
+          seller: { select: { email: true } },
+        },
+        orderBy: baseOrderBy,
+        skip,
+        take: limit,
+      })
+
+      produtos = produtosRaw.map((p) => ({
+        ...p,
+        sellerEmail: p.seller?.email ?? null,
+        isFavorite: false,
+      }))
+    }
+
+    const produtosPagina = produtos
 
     return NextResponse.json({
       produtos: produtosPagina,
