@@ -57,11 +57,9 @@ export async function GET(req) {
         ? { price: "asc" }
         : { publishedAt: "desc" }
 
-    // Get total count for pagination
     const totalProdutos = await prisma.product.count({ where })
     const totalPaginas = Math.max(1, Math.ceil(totalProdutos / limit))
     
-    // Calculate skip for pagination
     const skip = (page - 1) * limit
 
     const produtos = await prisma.product.findMany({
@@ -81,7 +79,6 @@ export async function GET(req) {
       isFavorite: Array.isArray(p.favorites) && p.favorites.length > 0,
     }))
 
-    // Sort favorites first within the current page
     const favoritos = produtosComFlag.filter((p) => p.isFavorite)
     const naoFavoritos = produtosComFlag.filter((p) => !p.isFavorite)
     const produtosPagina = [...favoritos, ...naoFavoritos]

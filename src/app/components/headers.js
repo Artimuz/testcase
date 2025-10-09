@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter, usePathname } from "next/navigation"
+import Link from "next/link"
 import { useAuth } from "@/contexts/AuthContext"
 
 const navigation = [
@@ -62,9 +63,9 @@ export default function Header() {
   return (
     <header className="header">
       <div className="header__container">
-        <a href="/" className="header__brand">
+        <Link href="/" className="header__brand">
           E-Commerce Store
-        </a>
+        </Link>
 
         {isAuthenticated && (
           <nav className="header__nav">

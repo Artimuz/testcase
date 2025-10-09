@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { withAuth, useAuth } from "@/contexts/AuthContext"
@@ -33,19 +33,7 @@ function ProductsPage() {
     }
   }, [])
 
-  useEffect(() => {
-    const params = new URLSearchParams()
-    if (busca) params.set("busca", busca)
-    if (ordem !== "novos") params.set("ordem", ordem)
-    if (paginaAtual > 1) params.set("page", paginaAtual)
-    router.replace(`?${params.toString()}`, { scroll: false })
-  }, [busca, ordem, paginaAtual, router])
-
-  useEffect(() => {
-    carregarProdutos()
-  }, [paginaAtual, ordem, busca])
-
-  async function carregarProdutos() {
+  const carregarProdutos = useCallback(async () => {
     setCarregando(true)
     try {
       const res = await fetch(
@@ -89,7 +77,19 @@ function ProductsPage() {
     } finally {
       setCarregando(false)
     }
-  }
+  }, [paginaAtual, produtosPorPagina, busca, ordem, user])
+
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (busca) params.set("busca", busca)
+    if (ordem !== "novos") params.set("ordem", ordem)
+    if (paginaAtual > 1) params.set("page", paginaAtual)
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }, [busca, ordem, paginaAtual, router])
+
+  useEffect(() => {
+    carregarProdutos()
+  }, [carregarProdutos])
 
   function handleBuscar(e) {
     e.preventDefault()
