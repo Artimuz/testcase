@@ -45,12 +45,10 @@ function ProductsPage() {
       const json = await res.json()
 
       if (!res.ok) {
-        console.error("Erro ao listar produtos:", json)
         setProdutos([])
         setTotalPaginas(1)
         return
       }
-
 
       let list = Array.isArray(json.produtos) ? json.produtos : []
       list = list.map((p) => ({ ...p, isFavorite: !!p.isFavorite }))
@@ -67,17 +65,11 @@ function ProductsPage() {
       
       setProdutos(list)
       setTotalPaginas(json.totalPaginas || Math.max(1, Math.ceil(list.length / produtosPorPagina)))
-
-      if (modalProduto) {
-        const atualizado = list.find((p) => p.id === modalProduto.id)
-        setModalProduto(atualizado || null)
-      }
     } catch (err) {
-      console.error("Erro ao carregar produtos:", err)
     } finally {
       setCarregando(false)
     }
-  }, [paginaAtual, produtosPorPagina, busca, ordem, user, modalProduto])
+  }, [paginaAtual, produtosPorPagina, busca, ordem, user])
 
   useEffect(() => {
     const params = new URLSearchParams()
@@ -90,6 +82,15 @@ function ProductsPage() {
   useEffect(() => {
     carregarProdutos()
   }, [carregarProdutos])
+
+  useEffect(() => {
+    if (modalProduto && produtos.length > 0) {
+      const atualizado = produtos.find((p) => p.id === modalProduto.id)
+      if (atualizado) {
+        setModalProduto(atualizado)
+      }
+    }
+  }, [produtos, modalProduto])
 
   function handleBuscar(e) {
     e.preventDefault()
