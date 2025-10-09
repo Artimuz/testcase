@@ -77,7 +77,7 @@ function ProductsPage() {
     } finally {
       setCarregando(false)
     }
-  }, [paginaAtual, produtosPorPagina, busca, ordem, user])
+  }, [paginaAtual, produtosPorPagina, busca, ordem, user, modalProduto])
 
   useEffect(() => {
     const params = new URLSearchParams()
