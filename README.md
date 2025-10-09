@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# E-Commerce Platform
 
-## Getting Started
+Uma plataforma completa de e-commerce que conecta vendedores e compradores, permitindo cadastro de produtos, gerenciamento de carrinho de compras, favoritos e processamento de pedidos.
 
-First, run the development server:
+**Contexto:** Este projeto foi desenvolvido como parte de um teste técnico.
 
+## Tecnologias Utilizadas
+
+- **Frontend:** Next.js 15, Tailwind CSS
+- **Backend:** Next.js API Routes
+- **Banco de Dados:** PostgreSQL com Prisma ORM
+- **Autenticação:** JWT (JSON Web Tokens) com bcryptjs
+- **Utilitários:** PapaParse (manipulação de CSV), ESLint
+- **Gerenciador de Pacotes:** npm
+
+## Como Executar o Projeto
+
+### Pré-requisitos
+- Node.js (versão 18 ou superior)
+- PostgreSQL instalado e configurado
+- npm ou yarn
+
+### Passo a passo
+
+1. **Clone o repositório**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <url-do-repositorio>
+cd casetest
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Instale as dependências**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. **Configure as variáveis de ambiente**
+```bash
+# Crie um arquivo .env na raiz do projeto
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/ecommerce"
+JWT_SECRET="sua-chave-secreta-jwt"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Execute as migrações do banco de dados**
+```bash
+npx prisma migrate dev
+```
 
-## Learn More
+5. **Inicie o servidor de desenvolvimento**
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+6. **Acesse a aplicação**
+```
+http://localhost:3000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Scripts disponíveis
+- `npm run dev` - Executa em modo desenvolvimento
+- `npm run build` - Gera build de produção
+- `npm start` - Executa a versão de produção
+- `npm run lint` - Executa verificação de código
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Funcionalidades
 
-## Deploy on Vercel
+### Para Compradores (CLIENTE)
+- **Autenticação:** Registro e login de usuários
+- **Catálogo:** Visualização e busca de produtos
+- **Carrinho:** Adição, remoção e gerenciamento de itens
+- **Favoritos:** Sistema de produtos favoritos
+- **Pedidos:** Finalização de compras e histórico de pedidos
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Para Vendedores (VENDEDOR)
+- **Gestão de Produtos:** Cadastro, edição e desabilitação de produtos
+- **Dashboard:** Visão geral de vendas e estatísticas
+- **Vendas:** Relatório de vendas realizadas
+- **Upload em Lote:** Importação de produtos via CSV
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Recursos Gerais
+- **Interface Responsiva:** Design adaptável para diferentes dispositivos
+- **Modo Escuro:** Interface com tema escuro
+- **Gerenciamento de Conta:** Habilitação/desabilitação de contas
+- **Sistema de Roles:** Diferenciação entre clientes e vendedores
+
+## Estrutura de Pastas
+
+```
+├── prisma/                  # Configuração e migrações do banco
+│   ├── schema.prisma        # Schema do banco de dados
+│   └── migrations/          # Migrações do Prisma
+├── src/
+│   ├── app/                 # App Router do Next.js
+│   │   ├── api/             # API Routes
+│   │   │   ├── auth/        # Endpoints de autenticação
+│   │   │   ├── products/    # Endpoints de produtos
+│   │   │   ├── cart/        # Endpoints do carrinho
+│   │   │   ├── orders/      # Endpoints de pedidos
+│   │   │   └── ...          # Outros endpoints
+│   │   ├── components/      # Componentes React
+│   │   ├── styles/          # Arquivos de estilo
+│   │   └── [pages]/         # Páginas da aplicação
+│   ├── contexts/            # Contextos React (AuthContext)
+│   └── lib/                 # Utilitários e configurações
+│       ├── auth.js          # Funções de autenticação
+│       ├── prisma.js        # Cliente Prisma
+│       └── utils.js         # Funções utilitárias
+├── package.json             # Dependências e scripts
+├── CSV-para-Testes          # CSV para Testes de upload
+└── README.md                # Documentação do projeto
+```
+
+## Autor
+
+Desenvolvido por **Alan Rodrigues da Silva**  
+[GitHub](https://github.com/Artimuz)
