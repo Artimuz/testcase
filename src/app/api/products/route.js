@@ -14,7 +14,6 @@ export async function POST(req) {
     const decoded = authResult.user
 
     const { name, price, description, quantity, urlImagem } = await req.json()
-    console.log(req.json())
 
     if (!name || !price || !description || !quantity || !urlImagem)
         return NextResponse.json({ error: "Campos obrigatórios ausentes" }, { status: 400 })

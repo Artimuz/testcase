@@ -35,7 +35,6 @@ export function AuthProvider({ children }) {
         setError(null)
         
         if (response.status !== 401 && !suppressErrors) {
-          console.log(`Falha na autenticação: ${response.status}`)
         }
       }
     } catch (err) {
