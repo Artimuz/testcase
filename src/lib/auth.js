@@ -3,11 +3,15 @@ import { NextResponse } from "next/server"
 import jwt from "jsonwebtoken"
 import { PrismaClient } from "@prisma/client"
 
-const JWT_SECRET = process.env.JWT_SECRET
+const JWT_SECRET = process.env.JWT_SECRET || "default_secret_key_1234567890"
 const prisma = new PrismaClient()
 
 export function createSession(payload) {
   const expiresInSeconds = 3600 // 1 hour
+
+  if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET not configured")
+  }
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: `${expiresInSeconds}s` })
 
